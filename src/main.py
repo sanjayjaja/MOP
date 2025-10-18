@@ -1,14 +1,15 @@
 from models.ModelBallMill import ModelBallMill
+from utils.DataToCSV import DataToCSV
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import csv 
-import os
 
 
 class Perovskites():
     def __init__(self):
         self.MBM = ModelBallMill()
+        self.DTC = DataToCSV()#self.MBM)
 
     def grams_salts(self, mmol, Cl, Br, I, f, Print = True):
         g = self.MBM.calc_precursor_g_mol(mmol, Cl, Br, I)
@@ -30,30 +31,42 @@ class Perovskites():
                    f"Calculated milling time in minutes {t:.2f} \n.")
             
     def generate_csv_precursors(self):#, mmol, Cl, Br, I):
-        g = self.MBM.calc_precursor_g_mol(3, 0.5, 0.0, 0.5)
+        g = np.around(self.MBM.calc_precursor_g_mol(3, 0.5, 0.0, 0.5), 4)
         n = 6
-        test_list = np.empty((6, 7))
+        test_list = np.empty((6, 10))#, dtype=object)
         
         for i in range(n):
-            row = np.hstack((3, g))
+            mole_fracs = np.array([0.5, 0, 0.5])
+            row = np.hstack((3, mole_fracs, g))
             test_list[i] = row
 
-        df = pd.DataFrame(test_list, columns = ("mmol", "DabcoCl2 (g)", "DabcoBr2 (g)", "DabcoI (g)", "NH4Cl (g)", "NH4Br (g)", "NH4I (g)"))
+        colnames = [
+                "mmol", "Frac Cl",  "Frac Br",  "Frac I",  "DabcoCl2 (g)", 
+                "DabcoBr2 (g)", "DabcoI (g)", "NH4Cl (g)", "NH4Br (g)", "NH4I (g)"
+            ]
+        
+        print()
+        df = pd.DataFrame(test_list, columns = colnames)
         df.to_csv("Data/test.csv", sep = ";", index = False)
 
-        #self.write_row_csv(g)
-        
-    def write_row_csv(self, dat):
-        with open('data/test.csv', 'a') as f_object:
-            writer_object = csv.writer(f_object)
-            writer_object.writerow(dat)
-            f_object.close()
+    def write_precursor_row(self, mmol, Cl, Br, I):
+        g = self.MBM.calc_precursor_g_mol(mmol, Cl, Br, I)
+        mole_fracs = np.array([Cl, Br, I])
+        row = np.around(np.hstack((3, mole_fracs, g)), 4)
+        self.DTC.write_row_csv(row)
+
+    # def write_row_csv(self, dat):
+    #     with open('data/test.csv', 'a') as f_object:
+    #         writer_object = csv.writer(f_object)
+    #         writer_object.writerow(dat)
+    #         f_object.close()
   
 
-
 if __name__ == '__main__':
-    p = Perovskites()
-    p.grams_salts(3, 0.5, 0.0, 0.5, 20, True)
-    p.generate_csv_precursors()
+    ps = Perovskites()
+    #ps.grams_salts(3, 0.5, 0.0, 0.5, 20, True)
+    ps.DTC.create_CSV()
+    ps.write_precursor_row(3, 0.5, 0.0, 0.5)
+    #p.generate_csv_precursors()
 
     pass
