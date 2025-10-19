@@ -8,9 +8,11 @@ from pathlib import Path
 
 
 class Perovskites():
+
     def __init__(self):
         self.MBM = ModelBallMill()
-        self.DTC = DataToCSV()#self.MBM)
+        self.DTC = DataToCSV() 
+        #self.MBM)
         
     def grams_salts(self, mmol, Cl, Br, I, f, Print = True):
         g = self.MBM.calc_precursor_g_mol(mmol, Cl, Br, I)
@@ -67,22 +69,27 @@ class Perovskites():
   
 
 if __name__ == '__main__':
-    #19-10: Calculations for the first synthesis runs
+    # 19-10: Calculations for the (proposed) first synthesis runs, all 3.0 mmol
     ps = Perovskites()
 
     fp = "PrecursorGrams.csv"
     ft = "MillingTimes.csv"
     T = True
+    Ch = True
 
-    ps.DTC.create_CSV(ps.DTC.col_labels_prec, fp)
-    ps.DTC.create_CSV(ps.DTC.col_labels_timefreq, ft)
-    ps.write_precursor_row(3, 0.25, 0.0, 0.75, fp, ft, T)
-    ps.write_precursor_row(3, 0.5, 0.0, 0.5  , fp, ft, T)
-    ps.write_precursor_row(3, 0.75, 0.0, 0.25, fp, ft, T)
-    ps.write_precursor_row(3, 0.25, 0.75, 0.0, fp, ft, T)
-    ps.write_precursor_row(3, 0.5, 0.5, 0.0  , fp, ft, T)
-    ps.write_precursor_row(3, 0.75, 0.25, 0.0, fp, ft, T)
-    ps.write_precursor_row(3, 0.0, 0.25, 0.75, fp, ft, T)
-    ps.write_precursor_row(3, 0.0, 0.5, 0.5  , fp, ft, T)
-    ps.write_precursor_row(3, 0.0, 0.75, 0.25, fp, ft, T)
+    # create_CSV func of subclass has option to check if duplicate files exist,
+    # and returns new name (fp, ft, etc) with filename_(filenumber + 1) if so. 
+
+    fp = ps.DTC.create_CSV(ps.DTC.col_labels_prec, fp, Ch)
+    ft = ps.DTC.create_CSV(ps.DTC.col_labels_timefreq, ft, Ch)
+
+    ps.write_precursor_row(3, 0.25, 0.0 , 0.75, fp, ft, T)
+    ps.write_precursor_row(3, 0.5 , 0.0 , 0.5 , fp, ft, T)
+    ps.write_precursor_row(3, 0.75, 0.0 , 0.25, fp, ft, T)
+    ps.write_precursor_row(3, 0.25, 0.75, 0.0 , fp, ft, T)
+    ps.write_precursor_row(3, 0.5 , 0.5 , 0.0 , fp, ft, T)
+    ps.write_precursor_row(3, 0.75, 0.25, 0.0 , fp, ft, T)
+    ps.write_precursor_row(3, 0.0 , 0.25, 0.75, fp, ft, T)
+    ps.write_precursor_row(3, 0.0 , 0.5 , 0.5 , fp, ft, T)
+    ps.write_precursor_row(3, 0.0 , 0.75, 0.25, fp, ft, T)
 
