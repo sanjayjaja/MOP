@@ -1,31 +1,58 @@
 import numpy as np
 from csv import writer
 import pandas as pd
+from pathlib import Path
 
 class DataToCSV:
     def __init__(self):#, MBM):
         #self.MBM = MBM
-        self.col_labels = [
-                "mmol", "Frac Cl",  "Frac Br",  "Frac I",  "DabcoCl2 (g)", 
-                "DabcoBr2 (g)", "DabcoI (g)", "NH4Cl (g)", "NH4Br (g)", "NH4I (g)"
-            ]
+        self.col_labels_prec = [
+                "mmol", "Frac Cl",  "Frac Br",  "Frac I",  "D-HCl2(g)", 
+                "D-HBr2(g)", "D-HBr2(g)", "NH4Cl(g)", "NH4I(g)", "NH4I(g)"]
+            #     "20hz_mn", "25hz_mn", "30hz_mn"
+            # ]
         
-        pass
+        self.col_labels_timefreq = [
+            "mmol", "Cl",  "Br",  "I", "20hz_mn", "21hz_mn", "22hz_mn", "23hz_mn", 
+            "24hz_mn", "25hz_mn", "26hz_mn", "27hz_mn", "28hz_mn", "29hz_mn", "30hz_mn"
+        ]
+    
 
-    def create_CSV(self, col_labels = None, filename = "test2.csv"):
+    def create_CSV(self, col_labels = None, filename = "data.csv"):
         if col_labels is None:
-            col_labels = self.col_labels
+            col_labels = self.col_labels_prec
         
         csv_df = pd.DataFrame(columns = col_labels)
         csv_df.to_csv(f"Data/{filename}", sep = ";", index = False)
 
     def write_row_csv(self, dat, filename = "test2.csv" ):
-        with open(f'data/{filename}', 'a') as f_object:
+        #file = Path(f"../src/data/{filename}")
+        
+        # if not file.is_file():
+        #     print("File doesnt exist")
+        #     return
+
+        with open(f'data/{filename}', 'a', newline='') as f_object:
             writer_object = writer(f_object, delimiter=";")
             writer_object.writerow(dat)
             f_object.close()
+
+    def write_rows_csv(self, data, filename = "test2.csv"):
+
+        with open(f'data/{filename}', 'a', newline='') as f_object:
+            for line in data:
+                writer_object = writer(f_object, delimiter=";")
+                writer_object.writerow(data)
+            f_object.close()
+
     
     def read_csv(self):
         pass
   
+if __name__ == '__main__':
+    file = Path("../src/data/test.csv")
+    if file.is_file():
+        print("exists")
+    else:
+        print("Error")
 

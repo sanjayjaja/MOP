@@ -8,6 +8,7 @@ class ModelBallMill:
         self.SI = SI
         self.SI_conv_factor = 1 if not self.SI else 10 ** -3
         self.SI_t_SI = 60 if not SI else 1
+        self.Na = 6.0331408 * 10 ** 23
 
         # Milling ball properties
         self.rho_ball = None
@@ -22,36 +23,42 @@ class ModelBallMill:
         self.v_jar = None 
 
         #Calculating Molar masses (in g/mmol and kg/mol if SI option on)
-        self.DabcoCl2 = 0.9250 / 5  * self.SI_conv_factor
-        self.DabcoBr2 = 0.822 / 3 * self.SI_conv_factor
-        self.DabcoI2 = 0.736 / 2  * self.SI_conv_factor
+        self.DacoHCl2 = 0.9250 / 5  * self.SI_conv_factor
+        self.DacoHBr2 = 0.822 / 3 * self.SI_conv_factor
+        self.DacoHI2 = 0.736 / 2  * self.SI_conv_factor
 
         self.NH4Cl = 0.267 / 5  * self.SI_conv_factor
         self.NH4Br = 0.293 / 3  * self.SI_conv_factor
         self.NH4i= 0.289 / 2  * self.SI_conv_factor
 
         self.moles = np.array([
-                self.DabcoCl2, 
-                self.DabcoBr2, 
-                self.DabcoI2, 
+                self.DacoHCl2, 
+                self.DacoHBr2, 
+                self.DacoHI2, 
                 self.NH4Cl,
                 self.NH4Br,
                 self.NH4i
             ])
 
-        #Densities precursors
-        self.rho_DabcoCl2 = 1 # * if not SI else 0.9250 / 5 * 10 ** -3
-        self.rho_DabcoBr2 = 1 #if not  SI else 0.822 / 3 * 10 ** -3
-        self.rho_DabcoI2 = 1  #if not SI else 0.736 / 2  * 10 ** -3
+        #Densities precursors 
 
-        self.rho_NH4Cl = 1   #if not SI else 0.267 / 5 * 10 ** -3
-        self.rho_NH4Br = 1   #if not SI else 0.293 / 3 * 10 ** -3
-        self.rho_NH4i= 1     #if not SI else 0.293 / 3 * 10 ** -3
+        #Densities of precursor not well known DabcoHCl2 has a density of 2.23 g/cm³ at 123K and density given at crystal structure after 265K (-8 C)
+
+        self.rho_DabcoHCl2 = 2.23 / self.SI_conv_factor
+        self.rho_DabcoHBr2 = 1 / self.SI_conv_factor
+        self.rho_DabcoHI2 = 1  / self.SI_conv_factor
+
+        #1.53 g/cm³at 68F/20C 1.519 in handbook of chem. and phys.
+        self.rho_NH4Cl = 1.52 / self.SI_conv_factor
+        #2.429 g/cm³ at 25C 
+        self.rho_NH4Br = 2.429 / self.SI_conv_factor
+        #2.56 at 20 C, 2.514 at 25 C
+        self.rho_NH4i= 2.56 / self.SI_conv_factor
 
         self.densities = np.array([
-                self.rho_DabcoCl2, 
-                self.rho_DabcoBr2, 
-                self.rho_DabcoI2, 
+                self.rho_DabcoHCl2, 
+                self.rho_DabcoHBr2, 
+                self.rho_DabcoHI2, 
                 self.rho_NH4Cl,
                 self.rho_NH4Br,
                 self.rho_NH4i
@@ -63,9 +70,9 @@ class ModelBallMill:
         self.e_I = 0.52056 * 10 ** 6 / 2
 
     def calc_precursor_g_mol(self, mmol, Cl, Br, I):
-        g_DabcoCl2 = self.DabcoCl2 * mmol * Cl * self.SI_conv_factor
-        g_DabcoBr2 = self.DabcoBr2 * mmol * Br * self.SI_conv_factor
-        g_DabcoI2  = self.DabcoI2  * mmol * I * self.SI_conv_factor
+        g_DabcoCl2 = self.DacoHCl2 * mmol * Cl * self.SI_conv_factor
+        g_DabcoBr2 = self.DacoHBr2 * mmol * Br * self.SI_conv_factor
+        g_DabcoI2  = self.DacoHI2  * mmol * I * self.SI_conv_factor
         g_NH4Cl   = self.NH4Cl * mmol * Cl * self.SI_conv_factor
         g_NH4Br   = self.NH4Br * mmol * Br * self.SI_conv_factor
         g_NH4i    = self.NH4i * mmol * I * self.SI_conv_factor
@@ -79,7 +86,7 @@ class ModelBallMill:
 
     def calculate_t(self, mmol, Cl, Br, I, f):
         e = (self.e_cl * Cl * mmol + self.e_br * Br * mmol + self.e_I * I * mmol) 
-        t = e / (0.01205 * f ** 3) / self.SI_t_SI 
+        t = (e / (0.01205 * f ** 3)) / 60
         return t
     
     def calculate_e(self, mmol, Cl, Br, I):
@@ -89,32 +96,32 @@ class ModelBallMill:
     def filling_factor(self, v_jar, grams):
         return (grams / self.densities) / v_jar
     
-    # def grams_salts(self, mmol, Cl, Br, I, f, Print = True):
-
-    #     g_DabcoCl2 = self.DabcoCl2 * mmol * Cl
-    #     g_DabcoBr2 = self.DabcoBr2 * mmol * Br
-    #     g_DabcoI2  = self.DabcoI2  * mmol * I
-    #     g_NH4Cl   = self.NH4Cl * mmol * Cl
-    #     g_NH4Br   = self.NH4Br * mmol * Br
-    #     g_NH4i    = self.NH4i * mmol * I
-
-    #     e = (self.e_cl * Cl * mmol + self.e_br * Br * mmol + self.e_I * I * mmol) 
-    #     t = e / (0.01205 * f ** 3) / 60
-        
-    #     if Print:
-    #         if Cl > 0:
-    #             print(f"Choride salts required for {mmol} mmol at {Cl*100} % of total moles")
-    #             print(f"DabcoCl2: {g_DabcoCl2:.4f} g, NH4Cl: {g_NH4Cl} g")
-    #         if Br > 0:
-    #             print(f"Bromide salts required for {mmol} mmol at {Br*100} % of total moles")
-    #             print(f"DabcoBr2: {g_DabcoBr2:.4f} g, NH4Br: {g_NH4Br} g")
-    #         if I > 0:
-    #             print(f"Iodide salts required for {mmol} mmol at {I*100} % of total moles")
-    #             print(f"DabcoI2: {g_DabcoI2:.4f} g, NH4I: {g_NH4i} g")
-
-    #         print(f"Total Reaction Energy = {e/1000:.4f} KJ.")#\n Calculated milling time in minutes {t:.2f} \n.")
-    #     return 
-
+    def calc_density(self, Z, M, a, b, c):
+        return (Z * M) / ((a * b * c) * self.Na)
+    
+    def calc_ball_weight(self, n, rho, d):
+        r = d/2
+        m = n * (4 / 3 * np.pi * r ** 3) * rho
+        return m    
+    
 if __name__ == '__main__':
-    pass
+    MBM = ModelBallMill()
+    #DabcoHCl2 ρ (g/cm³), note: seems to be a the room temp crystal phase
+    str1 = f"DabcoHCl2 ρ [g/cm³]: "
+    print(str1, MBM.calc_density(4, 185, 12.88 * 10 ** -8, 7.68 * 10 ** -8, 11.44 * 10 ** -8))
+    #NH4+Cl ρ (g/cm³)
+    str2 = f"{"NH4+Cl ρ [g/cm³]: ":<25}"
+    a = 3.868 * 10 ** -8
+    print(MBM.calc_density(4, 53.49, a, a, a))
+    #NH4+Br ρ (g/cm³)
+    str3 = f"DabcoHCl2 ρ [g/cm³]: "
+    a = 6.9 * 10 ** -8
+    print(MBM.calc_density(4, 97.94, a, a, a))
+    #NH4+I ρ (g/cm³)
+    str4 = f"DabcoHCl2 ρ [g/cm³]: "
+    a = 7.199 * 10 ** -8
+    print(MBM.calc_density(4, 144.943, a, a, a))
+    #NH4+Br ρ (g/cm³)
+
+    print(MBM.calc_ball_weight(2, 5.68, 1))
 

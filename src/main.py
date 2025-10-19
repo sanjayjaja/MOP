@@ -4,13 +4,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import csv 
+from pathlib import Path
 
 
 class Perovskites():
     def __init__(self):
         self.MBM = ModelBallMill()
         self.DTC = DataToCSV()#self.MBM)
-
+        
     def grams_salts(self, mmol, Cl, Br, I, f, Print = True):
         g = self.MBM.calc_precursor_g_mol(mmol, Cl, Br, I)
         e = self.MBM.calculate_e(mmol, Cl, Br, I)
@@ -29,44 +30,59 @@ class Perovskites():
             
             print(f"Total Reaction Energy = {e/1000:.4f} KJ. \n"
                    f"Calculated milling time in minutes {t:.2f} \n.")
-            
-    def generate_csv_precursors(self):#, mmol, Cl, Br, I):
-        g = np.around(self.MBM.calc_precursor_g_mol(3, 0.5, 0.0, 0.5), 4)
-        n = 6
-        test_list = np.empty((6, 10))#, dtype=object)
-        
-        for i in range(n):
-            mole_fracs = np.array([0.5, 0, 0.5])
-            row = np.hstack((3, mole_fracs, g))
-            test_list[i] = row
 
-        colnames = [
-                "mmol", "Frac Cl",  "Frac Br",  "Frac I",  "DabcoCl2 (g)", 
-                "DabcoBr2 (g)", "DabcoI (g)", "NH4Cl (g)", "NH4Br (g)", "NH4I (g)"
-            ]
+    def write_precursor_row(self, mmol, Cl, Br, I, file_prec = "test2.csv", 
+                            file_tfreq = "MillingTimes.csv", T = False):
         
-        print()
-        df = pd.DataFrame(test_list, columns = colnames)
-        df.to_csv("Data/test.csv", sep = ";", index = False)
-
-    def write_precursor_row(self, mmol, Cl, Br, I):
-        g = self.MBM.calc_precursor_g_mol(mmol, Cl, Br, I)
+        g = np.around(self.MBM.calc_precursor_g_mol(mmol, Cl, Br, I), 4)
         mole_fracs = np.array([Cl, Br, I])
-        row = np.around(np.hstack((3, mole_fracs, g)), 4)
-        self.DTC.write_row_csv(row)
+        
+        t20 = self.MBM.calculate_t(mmol, Cl, Br, I, 20)
+        t25 = self.MBM.calculate_t(mmol, Cl, Br, I, 25)
+        t30 = self.MBM.calculate_t(mmol, Cl, Br, I, 30)
+        times = np.around(np.array([t20, t25, t30]), 2)
+ 
+        row = np.hstack((3, mole_fracs, g))#, times))
+        self.DTC.write_row_csv(row, file_prec)
 
-    # def write_row_csv(self, dat):
-    #     with open('data/test.csv', 'a') as f_object:
-    #         writer_object = csv.writer(f_object)
-    #         writer_object.writerow(dat)
-    #         f_object.close()
+        if T:
+            #file = Path(f"/data/{file_tfreq}")
+
+            #if not file.is_file():
+                #self.DTC.create_CSV(self.DTC.col_labels_timefreq, file_tfreq)
+
+            f_list = np.arange(20, 31)
+            t_list = np.around(np.array([
+                self.MBM.calculate_t(mmol, Cl, Br, I, f) for f in f_list
+                ]), 2)
+            
+            row = np.hstack((mmol, mole_fracs, t_list))
+
+            self.DTC.write_row_csv(row, file_tfreq)
+
+    def MillingTimesToCsv(self):
+        pass
+
+
   
 
 if __name__ == '__main__':
+    #19-10: Calculations for the first synthesis runs
     ps = Perovskites()
-    #ps.grams_salts(3, 0.5, 0.0, 0.5, 20, True)
-    ps.DTC.create_CSV()
-    ps.write_precursor_row(3, 0.5, 0.0, 0.5)
-    #p.generate_csv_precursors()
 
-    pass
+    fp = "PrecursorGrams.csv"
+    ft = "MillingTimes.csv"
+    T = True
+
+    ps.DTC.create_CSV(ps.DTC.col_labels_prec, fp)
+    ps.DTC.create_CSV(ps.DTC.col_labels_timefreq, ft)
+    ps.write_precursor_row(3, 0.25, 0.0, 0.75, fp, ft, T)
+    ps.write_precursor_row(3, 0.5, 0.0, 0.5  , fp, ft, T)
+    ps.write_precursor_row(3, 0.75, 0.0, 0.25, fp, ft, T)
+    ps.write_precursor_row(3, 0.25, 0.75, 0.0, fp, ft, T)
+    ps.write_precursor_row(3, 0.5, 0.5, 0.0  , fp, ft, T)
+    ps.write_precursor_row(3, 0.75, 0.25, 0.0, fp, ft, T)
+    ps.write_precursor_row(3, 0.0, 0.25, 0.75, fp, ft, T)
+    ps.write_precursor_row(3, 0.0, 0.5, 0.5  , fp, ft, T)
+    ps.write_precursor_row(3, 0.0, 0.75, 0.25, fp, ft, T)
+
