@@ -8,7 +8,7 @@ class DataToCSV:
         #self.MBM = MBM
         self.col_labels_prec = [
                 "mmol", "Frac Cl",  "Frac Br",  "Frac I",  "D-HCl2(g)", 
-                "D-HBr2(g)", "D-HBr2(g)", "NH4Cl(g)", "NH4I(g)", "NH4I(g)"]
+                "D-HBr2(g)", "D-HI2(g)", "NH4Cl(g)", "NH4Br(g)", "NH4I(g)"]
             #     "20hz_mn", "25hz_mn", "30hz_mn"
             # ]
         
