@@ -1,1 +1,1 @@
-The Terms of service is just an edited template, and is in place such that I will have continued access to my own code. Changes are first made on github and a copy/fetch can be found on the teams page.
+The Terms of service is just an edited template, and is in place such that I will have continued access to my own code. Commits and updates are first made on github and a copy/fetch can be found on the teams page.
