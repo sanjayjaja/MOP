@@ -1,10 +1,10 @@
 Terms of Service
 
-Welcome to Sanjay Khadka's star caller bot ("we," "us," or "our"). These Terms of Service govern your access to and use of my program "(collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.
+Welcome to Sanjay Khadka's MOP calculation program for metal free molecular organic perovskites. ("we," "us," or "our"). These Terms of Service govern your access to and use of my program "(collectively, the "Service"). By accessing or using the Service, you agree to be bound by these Terms. If you do not agree, do not use the Service.
 
 ## Eligibility
 
-You must be a member of the Star Find or the Test discord. Some features may require a cetrain rank. 
+You must be a affialted to/member of the Vrije university or be granted permission to use. Some features may require a cetrain rank. 
 
 ## Intellectual Property
 
